@@ -324,6 +324,7 @@ const app = {
             let isSwiping = false;
             let isDeleting = false;
             const recordItem = wrapper.querySelector('.record-item');
+            const deleteButton = wrapper.querySelector('.delete-button');
             const maxSwipe = 100; // 最大滑动距离
 
             // 触摸开始
@@ -384,27 +385,25 @@ const app = {
                 wrapper.classList.remove('swiped');
             }, { passive: true });
 
-            // 点击wrapper（红色区域）删除
-            wrapper.addEventListener('click', (e) => {
-                // 如果已经滑动出删除按钮
-                if (wrapper.classList.contains('swiped') && !isDeleting) {
-                    e.stopPropagation();
-                    isDeleting = true;
+            // 点击删除按钮
+            deleteButton.addEventListener('click', (e) => {
+                if (isDeleting) return;
+                e.stopPropagation();
+                isDeleting = true;
 
-                    const recordId = parseInt(wrapper.getAttribute('data-id'));
+                const recordId = parseInt(wrapper.getAttribute('data-id'));
 
-                    // 删除动画
-                    recordItem.style.transition = 'all 0.4s ease';
-                    recordItem.style.transform = 'translateX(-100%)';
-                    recordItem.style.opacity = '0';
+                // 删除动画
+                recordItem.style.transition = 'all 0.4s ease';
+                recordItem.style.transform = 'translateX(-100%)';
+                recordItem.style.opacity = '0';
 
-                    setTimeout(() => {
-                        this.deleteRecord(recordId);
-                    }, 400);
-                }
+                setTimeout(() => {
+                    this.deleteRecord(recordId);
+                }, 400);
             });
 
-            // 点击记录内容区域（未滑动时）收回删除按钮
+            // 点击记录内容区域收回删除按钮
             recordItem.addEventListener('click', (e) => {
                 if (wrapper.classList.contains('swiped') && !isDeleting) {
                     e.stopPropagation();
