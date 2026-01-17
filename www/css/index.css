@@ -149,7 +149,7 @@ body {
     max-width: 600px;
     margin: 0 auto;
     padding: 40px 20px;
-    padding-top: max(100px, calc(env(safe-area-inset-top, 60px) + 40px));
+    padding-top: max(140px, calc(env(safe-area-inset-top, 60px) + 80px));
     position: relative;
     z-index: 1;
 }
@@ -157,8 +157,8 @@ body {
 /* Header */
 .header {
     text-align: center;
-    margin-bottom: 40px;
-    padding: 30px;
+    margin-bottom: 30px;
+    padding: 25px 20px;
     background: rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(40px);
     -webkit-backdrop-filter: blur(40px);
@@ -220,9 +220,9 @@ body {
 }
 
 .header h1 {
-    font-size: 3em;
+    font-size: 2.6em;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     letter-spacing: 1px;
     text-shadow:
         0 2px 10px rgba(0, 0, 0, 0.3),
@@ -231,12 +231,12 @@ body {
 }
 
 .subtitle {
-    font-size: 1.1em;
+    font-size: 1em;
     font-weight: 500;
     color: var(--text-light);
     letter-spacing: 0.5px;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    line-height: 1.6;
+    line-height: 1.5;
 }
 
 /* Progress Container */
