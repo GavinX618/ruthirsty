@@ -149,7 +149,7 @@ body {
     max-width: 600px;
     margin: 0 auto;
     padding: 40px 20px;
-    padding-top: max(60px, env(safe-area-inset-top, 60px));
+    padding-top: max(100px, calc(env(safe-area-inset-top, 60px) + 40px));
     position: relative;
     z-index: 1;
 }
@@ -347,13 +347,14 @@ body {
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 8px;
     transition: all 0.3s ease;
 }
 
 .total-item:hover {
     background: rgba(255, 255, 255, 0.12);
-    transform: translateX(5px);
+    transform: scale(1.05);
     box-shadow:
         0 6px 20px rgba(6, 182, 212, 0.25),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
