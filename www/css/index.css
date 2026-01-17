@@ -655,44 +655,14 @@ body {
     color: rgba(255, 255, 255, 0.5);
 }
 
-/* Record Item Wrapper - for swipe delete */
-.record-item-wrapper {
-    position: relative;
-    margin-bottom: 15px;
-    height: auto;
-    border-radius: 20px;
-    overflow: hidden;
-}
-
-/* Delete Button - hidden on the right side */
-.delete-button {
-    position: absolute;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 100px;
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 700;
-    font-size: 1em;
-    letter-spacing: 0.5px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    user-select: none;
-    z-index: 1;
-    border-radius: 20px;
-}
-
-/* Record Item - sits on top, can slide left */
+/* Record Item - Glass Card */
 .record-item {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
     gap: 15px;
     padding: 20px;
+    margin-bottom: 15px;
     background: rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -701,18 +671,11 @@ body {
     box-shadow:
         0 4px 16px rgba(31, 38, 135, 0.15),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     animation: slideInLeft 0.5s ease-out forwards;
     opacity: 0;
     position: relative;
     overflow: hidden;
-    transform: translateX(0);
-    z-index: 2;
-    cursor: grab;
-    touch-action: pan-y;
-}
-
-.record-item:active {
-    cursor: grabbing;
 }
 
 .record-item::before {
@@ -939,10 +902,6 @@ body {
         font-size: 1.2em;
         padding: 12px 20px;
         margin-bottom: 25px;
-    }
-
-    .record-item-wrapper {
-        margin-bottom: 12px;
     }
 
     .record-item {

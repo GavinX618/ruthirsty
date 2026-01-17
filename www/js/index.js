@@ -288,20 +288,15 @@ const app = {
             const badgeText = amount >= 300 ? '大杯' : amount >= 200 ? '中杯' : '小杯';
 
             html += `
-                <div class="record-item-wrapper" data-id="${record.id}">
-                    <div class="record-item" style="animation-delay: ${index * 0.05}s">
-                        <div class="record-icon">💧</div>
-                        <div class="record-info">
-                            <div class="record-time">${record.time}</div>
-                            <div class="record-date">${record.date}</div>
-                        </div>
-                        <div class="record-amount">
-                            <div class="record-volume">${amount}ml</div>
-                            <div class="record-badge">${badgeText}</div>
-                        </div>
+                <div class="record-item" style="animation-delay: ${index * 0.05}s">
+                    <div class="record-icon">💧</div>
+                    <div class="record-info">
+                        <div class="record-time">${record.time}</div>
+                        <div class="record-date">${record.date}</div>
                     </div>
-                    <div class="delete-button">
-                        <span>删除</span>
+                    <div class="record-amount">
+                        <div class="record-volume">${amount}ml</div>
+                        <div class="record-badge">${badgeText}</div>
                     </div>
                 </div>
             `;
@@ -309,132 +304,6 @@ const app = {
 
         recordsList.innerHTML = html;
         console.log('记录列表已更新，显示', todayRecords.length, '条记录');
-
-        // 绑定滑动删除事件
-        this.bindSwipeEvents();
-    },
-
-    // 绑定滑动删除事件
-    bindSwipeEvents: function() {
-        const wrappers = document.querySelectorAll('.record-item-wrapper');
-
-        wrappers.forEach(wrapper => {
-            let startX = 0;
-            let currentX = 0;
-            let isSwiping = false;
-            let isDeleting = false;
-            const recordItem = wrapper.querySelector('.record-item');
-            const deleteButton = wrapper.querySelector('.delete-button');
-            const maxSwipe = 100; // 最大滑动距离
-
-            // 触摸开始
-            recordItem.addEventListener('touchstart', (e) => {
-                if (isDeleting) return;
-                startX = e.touches[0].clientX;
-                currentX = startX;
-                isSwiping = true;
-                recordItem.style.transition = 'none';
-            }, { passive: true });
-
-            // 触摸移动
-            recordItem.addEventListener('touchmove', (e) => {
-                if (!isSwiping || isDeleting) return;
-
-                currentX = e.touches[0].clientX;
-                let diffX = currentX - startX;
-
-                // 只允许向左滑动
-                if (diffX < 0) {
-                    // 限制最大滑动距离
-                    if (diffX < -maxSwipe) {
-                        diffX = -maxSwipe;
-                    }
-                    recordItem.style.transform = `translateX(${diffX}px)`;
-                } else {
-                    // 向右滑动时保持在0位置
-                    recordItem.style.transform = 'translateX(0px)';
-                }
-            });
-
-            // 触摸结束
-            recordItem.addEventListener('touchend', () => {
-                if (!isSwiping || isDeleting) return;
-                isSwiping = false;
-
-                const diffX = currentX - startX;
-                recordItem.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-
-                // 判断是否显示删除
-                if (diffX < -50) {
-                    // 滑动超过50px，停留在-100px显示删除
-                    recordItem.style.transform = 'translateX(-100px)';
-                    wrapper.classList.add('swiped');
-                } else {
-                    // 回弹到原位
-                    recordItem.style.transform = 'translateX(0px)';
-                    wrapper.classList.remove('swiped');
-                }
-            }, { passive: true });
-
-            // 触摸取消
-            recordItem.addEventListener('touchcancel', () => {
-                if (!isSwiping || isDeleting) return;
-                isSwiping = false;
-                recordItem.style.transition = 'transform 0.3s ease';
-                recordItem.style.transform = 'translateX(0px)';
-                wrapper.classList.remove('swiped');
-            }, { passive: true });
-
-            // 点击删除按钮
-            deleteButton.addEventListener('click', (e) => {
-                if (isDeleting) return;
-                e.stopPropagation();
-                isDeleting = true;
-
-                const recordId = parseInt(wrapper.getAttribute('data-id'));
-
-                // 删除动画
-                recordItem.style.transition = 'all 0.4s ease';
-                recordItem.style.transform = 'translateX(-100%)';
-                recordItem.style.opacity = '0';
-
-                setTimeout(() => {
-                    this.deleteRecord(recordId);
-                }, 400);
-            });
-
-            // 点击记录内容区域收回删除按钮
-            recordItem.addEventListener('click', (e) => {
-                if (wrapper.classList.contains('swiped') && !isDeleting) {
-                    e.stopPropagation();
-                    recordItem.style.transition = 'transform 0.3s ease';
-                    recordItem.style.transform = 'translateX(0px)';
-                    wrapper.classList.remove('swiped');
-                }
-            });
-        });
-    },
-
-    // 删除记录
-    deleteRecord: function(recordId) {
-        // 获取所有记录
-        let records = this.getRecords();
-
-        // 找到要删除的记录
-        const recordToDelete = records.find(r => r.id === recordId);
-        if (!recordToDelete) return;
-
-        // 从数组中删除
-        records = records.filter(r => r.id !== recordId);
-
-        // 保存更新后的记录
-        this.saveRecords(records);
-
-        // 更新界面
-        this.updateUI();
-
-        // 显示提示
-        this.showToast(`🗑️ 已删除 ${recordToDelete.amount}ml 打卡记录`);
     },
 
     // 显示提示信息
