@@ -398,96 +398,162 @@ body {
 
 /* Section Title */
 .section-title {
-    font-size: 1.3em;
-    font-weight: 600;
-    color: var(--text-light);
-    margin-bottom: 20px;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 30px;
     text-align: center;
-    letter-spacing: 0.5px;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    letter-spacing: 1px;
+    text-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(6, 182, 212, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 15px 30px;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+    box-shadow:
+        0 4px 16px rgba(6, 182, 212, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* Quick Buttons */
 .quick-buttons {
-    margin-bottom: 40px;
+    margin-bottom: 50px;
     animation: scaleIn 0.6s ease-out 0.4s backwards;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .button-group {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    flex-wrap: wrap;
 }
 
 .amount-button {
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    border: 1.5px solid rgba(255, 255, 255, 0.25);
-    border-radius: 25px;
-    padding: 30px 20px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 3px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    width: 140px;
+    height: 140px;
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     box-shadow:
-        0 8px 24px rgba(31, 38, 135, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 12px 35px rgba(31, 38, 135, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        0 0 0 0 rgba(6, 182, 212, 0.5);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: pulse-ring 2s ease-in-out infinite;
 }
 
 .amount-button::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border-radius: 50%;
     background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.6),
-        transparent
+        135deg,
+        rgba(6, 182, 212, 0.4),
+        rgba(20, 184, 166, 0.4),
+        rgba(251, 113, 133, 0.4)
     );
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.amount-button:hover::before {
+    opacity: 1;
 }
 
 .amount-button:hover {
-    transform: translateY(-8px) scale(1.05);
-    border-color: rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.18);
+    transform: translateY(-12px) scale(1.15);
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.25);
     box-shadow:
-        0 15px 40px rgba(6, 182, 212, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        0 20px 50px rgba(6, 182, 212, 0.5),
+        inset 0 2px 0 rgba(255, 255, 255, 0.5),
+        0 0 0 8px rgba(6, 182, 212, 0.3),
+        0 0 30px rgba(6, 182, 212, 0.6);
 }
 
 .amount-button:active {
-    transform: translateY(-4px) scale(1);
+    transform: translateY(-6px) scale(1.05);
 }
 
 .amount-button.primary {
-    background: rgba(6, 182, 212, 0.2);
-    border-color: rgba(6, 182, 212, 0.5);
+    background: rgba(6, 182, 212, 0.25);
+    border-color: rgba(6, 182, 212, 0.6);
+    width: 160px;
+    height: 160px;
+    border-width: 4px;
+    box-shadow:
+        0 15px 40px rgba(6, 182, 212, 0.4),
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        0 0 0 0 rgba(6, 182, 212, 0.6);
 }
 
 .amount-button.primary:hover {
-    background: rgba(6, 182, 212, 0.3);
-    border-color: rgba(6, 182, 212, 0.7);
+    background: rgba(6, 182, 212, 0.35);
+    border-color: rgba(6, 182, 212, 0.8);
+    box-shadow:
+        0 25px 60px rgba(6, 182, 212, 0.6),
+        inset 0 2px 0 rgba(255, 255, 255, 0.5),
+        0 0 0 12px rgba(6, 182, 212, 0.4),
+        0 0 40px rgba(6, 182, 212, 0.8);
+}
+
+@keyframes pulse-ring {
+    0%, 100% {
+        box-shadow:
+            0 12px 35px rgba(31, 38, 135, 0.3),
+            inset 0 2px 0 rgba(255, 255, 255, 0.4),
+            0 0 0 0 rgba(6, 182, 212, 0.5);
+    }
+    50% {
+        box-shadow:
+            0 12px 35px rgba(31, 38, 135, 0.3),
+            inset 0 2px 0 rgba(255, 255, 255, 0.4),
+            0 0 0 4px rgba(6, 182, 212, 0.3);
+    }
 }
 
 .button-amount {
-    font-size: 1.8em;
-    font-weight: 700;
-    color: var(--text-light);
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, #fff 0%, #06b6d4 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 2.2em;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 6px;
+    text-shadow:
+        0 2px 10px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(6, 182, 212, 0.6);
+    line-height: 1;
 }
 
 .button-desc {
-    font-size: 0.95em;
-    color: var(--text-subtle);
-    font-weight: 500;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.5px;
 }
 
 /* Button Press Animation */
@@ -802,19 +868,27 @@ body {
     }
 
     .button-group {
-        gap: 10px;
+        gap: 20px;
     }
 
     .amount-button {
-        padding: 25px 15px;
+        width: 110px;
+        height: 110px;
+        border-width: 2.5px;
+    }
+
+    .amount-button.primary {
+        width: 130px;
+        height: 130px;
+        border-width: 3px;
     }
 
     .button-amount {
-        font-size: 1.5em;
+        font-size: 1.8em;
     }
 
     .button-desc {
-        font-size: 0.85em;
+        font-size: 0.75em;
     }
 
     .records-container {
@@ -823,6 +897,8 @@ body {
 
     .section-title {
         font-size: 1.2em;
+        padding: 12px 20px;
+        margin-bottom: 25px;
     }
 
     .record-item {
