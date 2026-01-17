@@ -322,85 +322,94 @@ const app = {
             let startX = 0;
             let currentX = 0;
             let isSwiping = false;
+            let isDeleting = false;
             const recordItem = wrapper.querySelector('.record-item');
-            const deleteButton = wrapper.querySelector('.delete-button');
+            const maxSwipe = 100; // 最大滑动距离
 
             // 触摸开始
             recordItem.addEventListener('touchstart', (e) => {
+                if (isDeleting) return;
                 startX = e.touches[0].clientX;
                 currentX = startX;
                 isSwiping = true;
-                // 移除过渡效果，使滑动更流畅
                 recordItem.style.transition = 'none';
-            });
+            }, { passive: true });
 
             // 触摸移动
             recordItem.addEventListener('touchmove', (e) => {
-                if (!isSwiping) return;
+                if (!isSwiping || isDeleting) return;
 
                 currentX = e.touches[0].clientX;
-                const diffX = currentX - startX;
+                let diffX = currentX - startX;
 
-                // 只允许向左滑动，且限制最大滑动距离为80px
-                if (diffX < 0 && diffX >= -80) {
-                    e.preventDefault(); // 防止页面滚动
+                // 只允许向左滑动
+                if (diffX < 0) {
+                    // 限制最大滑动距离
+                    if (diffX < -maxSwipe) {
+                        diffX = -maxSwipe;
+                    }
                     recordItem.style.transform = `translateX(${diffX}px)`;
-                } else if (diffX > 0) {
-                    // 不允许向右滑动
-                    recordItem.style.transform = 'translateX(0)';
+                } else {
+                    // 向右滑动时保持在0位置
+                    recordItem.style.transform = 'translateX(0px)';
                 }
             });
 
             // 触摸结束
             recordItem.addEventListener('touchend', () => {
-                if (!isSwiping) return;
+                if (!isSwiping || isDeleting) return;
                 isSwiping = false;
 
                 const diffX = currentX - startX;
-                // 添加过渡动画
-                recordItem.style.transition = 'transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                recordItem.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
-                // 如果滑动超过40px，显示删除按钮（停在-80px位置）
-                if (diffX <= -40) {
-                    recordItem.style.transform = 'translateX(-80px)';
+                // 判断是否显示删除
+                if (diffX < -50) {
+                    // 滑动超过50px，停留在-100px显示删除
+                    recordItem.style.transform = 'translateX(-100px)';
                     wrapper.classList.add('swiped');
                 } else {
-                    // 否则回弹到原位，隐藏删除按钮
-                    recordItem.style.transform = 'translateX(0)';
+                    // 回弹到原位
+                    recordItem.style.transform = 'translateX(0px)';
                     wrapper.classList.remove('swiped');
+                }
+            }, { passive: true });
+
+            // 触摸取消
+            recordItem.addEventListener('touchcancel', () => {
+                if (!isSwiping || isDeleting) return;
+                isSwiping = false;
+                recordItem.style.transition = 'transform 0.3s ease';
+                recordItem.style.transform = 'translateX(0px)';
+                wrapper.classList.remove('swiped');
+            }, { passive: true });
+
+            // 点击wrapper（红色区域）删除
+            wrapper.addEventListener('click', (e) => {
+                // 如果已经滑动出删除按钮
+                if (wrapper.classList.contains('swiped') && !isDeleting) {
+                    e.stopPropagation();
+                    isDeleting = true;
+
+                    const recordId = parseInt(wrapper.getAttribute('data-id'));
+
+                    // 删除动画
+                    recordItem.style.transition = 'all 0.4s ease';
+                    recordItem.style.transform = 'translateX(-100%)';
+                    recordItem.style.opacity = '0';
+
+                    setTimeout(() => {
+                        this.deleteRecord(recordId);
+                    }, 400);
                 }
             });
 
-            // 触摸取消（如接到电话等）
-            recordItem.addEventListener('touchcancel', () => {
-                if (!isSwiping) return;
-                isSwiping = false;
-                recordItem.style.transition = 'transform 0.3s ease';
-                recordItem.style.transform = 'translateX(0)';
-                wrapper.classList.remove('swiped');
-            });
-
-            // 点击删除按钮
-            deleteButton.addEventListener('click', (e) => {
-                e.stopPropagation(); // 阻止事件冒泡
-                const recordId = parseInt(wrapper.getAttribute('data-id'));
-
-                // 添加删除动画
-                recordItem.style.transition = 'all 0.3s ease';
-                recordItem.style.transform = 'translateX(-100%)';
-                recordItem.style.opacity = '0';
-
-                // 等待动画完成后删除
-                setTimeout(() => {
-                    this.deleteRecord(recordId);
-                }, 300);
-            });
-
-            // 点击记录项其他地方，收回删除按钮
+            // 点击记录内容区域（未滑动时）收回删除按钮
             recordItem.addEventListener('click', (e) => {
-                if (wrapper.classList.contains('swiped')) {
-                    e.preventDefault(); // 防止其他点击事件
-                    recordItem.style.transform = 'translateX(0)';
+                if (wrapper.classList.contains('swiped') && !isDeleting) {
+                    e.stopPropagation();
+                    recordItem.style.transition = 'transform 0.3s ease';
+                    recordItem.style.transform = 'translateX(0px)';
                     wrapper.classList.remove('swiped');
                 }
             });
