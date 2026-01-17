@@ -11,6 +11,9 @@ let DAILY_GOAL = 2000;
 let reminderTimer = null;
 let lastNotificationTime = 0;
 
+// 日历状态
+let currentCalendarDate = new Date();
+
 // 音频上下文（用于生成声音）
 let audioContext = null;
 
@@ -103,6 +106,7 @@ const app = {
 
         settingsBtn.addEventListener('click', () => {
             settingsModal.classList.add('show');
+            this.renderCalendar(); // 打开设置时渲染日历
         });
 
         closeSettingsBtn.addEventListener('click', () => {
@@ -171,6 +175,20 @@ const app = {
             const value = parseInt(dailyGoalInput.value);
             if (value < 500) dailyGoalInput.value = 500;
             if (value > 5000) dailyGoalInput.value = 5000;
+        });
+
+        // 绑定日历导航按钮
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+
+        prevMonthBtn.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            this.renderCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            this.renderCalendar();
         });
     },
 
@@ -677,6 +695,63 @@ const app = {
             // 如果没有通知权限，使用toast提示
             this.showToast(message);
         }
+    },
+
+    // 获取所有有打卡记录的日期
+    getCheckedDates: function() {
+        const records = this.getRecords();
+        // 获取所有不重复的日期
+        const uniqueDates = [...new Set(records.map(r => r.date))];
+        return uniqueDates;
+    },
+
+    // 渲染日历
+    renderCalendar: function() {
+        const year = currentCalendarDate.getFullYear();
+        const month = currentCalendarDate.getMonth();
+
+        // 更新月份显示
+        const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月',
+                           '7月', '8月', '9月', '10月', '11月', '12月'];
+        document.getElementById('calendarMonth').textContent = `${year}年${monthNames[month]}`;
+
+        // 获取本月第一天和最后一天
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const firstDayOfWeek = firstDay.getDay(); // 0 = 周日
+
+        // 获取有打卡记录的日期
+        const checkedDates = this.getCheckedDates();
+
+        // 今天的日期（用于高亮）
+        const today = new Date();
+        const todayStr = this.formatDate(today);
+
+        // 生成日历HTML
+        let calendarHTML = '';
+
+        // 填充前面的空白（从周日开始）
+        for (let i = 0; i < firstDayOfWeek; i++) {
+            calendarHTML += '<div class="calendar-day empty"></div>';
+        }
+
+        // 填充本月的日期
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const dateStr = this.formatDate(date);
+            const isToday = dateStr === todayStr;
+            const isChecked = checkedDates.includes(dateStr);
+
+            let className = 'calendar-day';
+            if (isToday) className += ' today';
+            if (isChecked) className += ' checked';
+
+            calendarHTML += `<div class="${className}">${day}</div>`;
+        }
+
+        // 更新DOM
+        document.getElementById('calendarDays').innerHTML = calendarHTML;
     }
 };
 

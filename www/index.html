@@ -192,6 +192,38 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 打卡日历 -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">📅 打卡日历</h3>
+                    <div class="calendar-header">
+                        <button class="calendar-nav-btn" id="prevMonth">‹</button>
+                        <span class="calendar-month" id="calendarMonth">2024年1月</span>
+                        <button class="calendar-nav-btn" id="nextMonth">›</button>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <div class="weekday">日</div>
+                        <div class="weekday">一</div>
+                        <div class="weekday">二</div>
+                        <div class="weekday">三</div>
+                        <div class="weekday">四</div>
+                        <div class="weekday">五</div>
+                        <div class="weekday">六</div>
+                    </div>
+                    <div class="calendar-days" id="calendarDays">
+                        <!-- 日期将通过JavaScript动态生成 -->
+                    </div>
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot checked"></span>
+                            <span class="legend-text">已打卡</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot today"></span>
+                            <span class="legend-text">今天</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
