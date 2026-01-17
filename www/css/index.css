@@ -149,7 +149,7 @@ body {
     max-width: 600px;
     margin: 0 auto;
     padding: 40px 20px;
-    padding-top: max(140px, calc(env(safe-area-inset-top, 60px) + 80px));
+    padding-top: max(170px, calc(env(safe-area-inset-top, 60px) + 110px));
     position: relative;
     z-index: 1;
 }
@@ -231,7 +231,7 @@ body {
 }
 
 .subtitle {
-    font-size: 0.85em;
+    font-size: 0.75em;
     font-weight: 500;
     color: var(--text-light);
     letter-spacing: 0.3px;
