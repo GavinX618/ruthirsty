@@ -93,6 +93,24 @@ const app = {
             });
         });
 
+        // 绑定设置按钮
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+
+        settingsBtn.addEventListener('click', () => {
+            settingsModal.classList.add('show');
+        });
+
+        closeSettingsBtn.addEventListener('click', () => {
+            settingsModal.classList.remove('show');
+        });
+
+        settingsOverlay.addEventListener('click', () => {
+            settingsModal.classList.remove('show');
+        });
+
         // 绑定提醒开关
         const reminderToggle = document.getElementById('reminderToggle');
         const reminderTimeSettings = document.getElementById('reminderTimeSettings');

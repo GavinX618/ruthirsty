@@ -44,6 +44,9 @@
     <div class="app">
         <!-- 头部区域 -->
         <header class="header">
+            <button class="settings-btn" id="settingsBtn">
+                <span>⚙️</span>
+            </button>
             <h1>💧 我要喝水</h1>
             <p class="subtitle">光联万物，光感万业；喝水打卡，健康追光！</p>
         </header>
@@ -106,33 +109,6 @@
             </div>
         </div>
 
-        <!-- 提醒设置 -->
-        <div class="reminder-settings">
-            <h3 class="section-title">⏰ 智能提醒</h3>
-            <div class="reminder-content">
-                <div class="reminder-toggle">
-                    <span class="reminder-label">开启提醒</span>
-                    <label class="switch">
-                        <input type="checkbox" id="reminderToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                <div class="reminder-time-settings" id="reminderTimeSettings" style="display: none;">
-                    <div class="time-setting-row">
-                        <span class="time-label">开始时间</span>
-                        <input type="time" id="reminderStartTime" value="08:00" class="time-input">
-                    </div>
-                    <div class="time-setting-row">
-                        <span class="time-label">结束时间</span>
-                        <input type="time" id="reminderEndTime" value="20:00" class="time-input">
-                    </div>
-                    <div class="reminder-info">
-                        💡 系统会根据您的喝水进度智能提醒
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- 快捷打卡按钮组 -->
         <div class="quick-buttons">
             <h3 class="section-title">👇 点击下方按钮打卡</h3>
@@ -160,6 +136,57 @@
                     <div class="empty-icon">💧</div>
                     <p>还没有喝水记录</p>
                     <p class="empty-hint">选择饮水量开始打卡吧！</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 设置弹窗 -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-overlay" id="settingsOverlay"></div>
+        <div class="settings-panel">
+            <div class="settings-header">
+                <h2>⚙️ 设置</h2>
+                <button class="close-btn" id="closeSettingsBtn">✕</button>
+            </div>
+            <div class="settings-content">
+                <!-- 智能提醒设置 -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">⏰ 智能提醒</h3>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">开启提醒</span>
+                            <span class="setting-desc">根据喝水进度智能提醒</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="reminderToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="reminder-time-settings" id="reminderTimeSettings" style="display: none;">
+                        <div class="setting-item">
+                            <span class="setting-label">开始时间</span>
+                            <input type="time" id="reminderStartTime" value="08:00" class="time-input">
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">结束时间</span>
+                            <input type="time" id="reminderEndTime" value="20:00" class="time-input">
+                        </div>
+                        <div class="reminder-info">
+                            💡 系统会根据您的喝水进度智能提醒
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 其他设置 -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">📊 其他设置</h3>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">每日目标</span>
+                            <span class="setting-desc">当前目标：2000ml</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
