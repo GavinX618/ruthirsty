@@ -632,6 +632,39 @@ body {
     color: #666;
 }
 
+/* Goal Input */
+.goal-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.goal-input {
+    width: 100px;
+    padding: 10px 12px;
+    background: rgba(102, 126, 234, 0.1);
+    border: 1.5px solid rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
+    color: #333;
+    font-size: 1em;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.goal-input:focus {
+    outline: none;
+    background: rgba(102, 126, 234, 0.15);
+    border-color: rgba(102, 126, 234, 0.6);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.goal-unit {
+    font-size: 1em;
+    font-weight: 600;
+    color: #667eea;
+}
+
 /* Reminder Settings */
 .reminder-settings {
     margin-bottom: 40px;

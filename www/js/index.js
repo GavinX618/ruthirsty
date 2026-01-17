@@ -2,9 +2,10 @@
 // 数据存储键名
 const STORAGE_KEY = 'ruthirsty_records';
 const REMINDER_SETTINGS_KEY = 'ruthirsty_reminder_settings';
+const DAILY_GOAL_KEY = 'ruthirsty_daily_goal';
 
-// 每日目标（ml）
-const DAILY_GOAL = 2000;
+// 每日目标（ml）- 默认值
+let DAILY_GOAL = 2000;
 
 // 提醒定时器
 let reminderTimer = null;
@@ -77,6 +78,7 @@ const app = {
         console.log('App is ready');
         this.bindEvents();
         this.loadRecords();
+        this.loadDailyGoal();
         this.loadReminderSettings();
         this.updateUI();
         this.requestNotificationPermission();
@@ -147,6 +149,28 @@ const app = {
                 this.stopReminder();
                 this.startReminder();
             }
+        });
+
+        // 绑定每日目标输入框
+        const dailyGoalInput = document.getElementById('dailyGoalInput');
+        dailyGoalInput.addEventListener('change', () => {
+            const newGoal = parseInt(dailyGoalInput.value);
+            if (newGoal >= 500 && newGoal <= 5000) {
+                DAILY_GOAL = newGoal;
+                this.saveDailyGoal();
+                this.updateUI();
+                this.showToast(`✅ 每日目标已更新为 ${newGoal}ml`);
+            } else {
+                this.showToast('❌ 目标应在500-5000ml之间');
+                dailyGoalInput.value = DAILY_GOAL;
+            }
+        });
+
+        // 输入时限制范围
+        dailyGoalInput.addEventListener('input', () => {
+            const value = parseInt(dailyGoalInput.value);
+            if (value < 500) dailyGoalInput.value = 500;
+            if (value > 5000) dailyGoalInput.value = 5000;
         });
     },
 
@@ -240,6 +264,10 @@ const app = {
 
     // 更新界面
     updateUI: function() {
+        // 更新目标显示
+        document.getElementById('goalTarget').textContent = DAILY_GOAL;
+        document.getElementById('goalDisplay').textContent = DAILY_GOAL;
+
         this.updateProgress();
         this.updateStats();
         this.renderRecordsList();
@@ -461,6 +489,28 @@ const app = {
             Notification.requestPermission().then(permission => {
                 console.log('Notification permission:', permission);
             });
+        }
+    },
+
+    // 加载每日目标
+    loadDailyGoal: function() {
+        try {
+            const savedGoal = localStorage.getItem(DAILY_GOAL_KEY);
+            if (savedGoal) {
+                DAILY_GOAL = parseInt(savedGoal);
+                document.getElementById('dailyGoalInput').value = DAILY_GOAL;
+            }
+        } catch (e) {
+            console.error('Error loading daily goal:', e);
+        }
+    },
+
+    // 保存每日目标
+    saveDailyGoal: function() {
+        try {
+            localStorage.setItem(DAILY_GOAL_KEY, DAILY_GOAL.toString());
+        } catch (e) {
+            console.error('Error saving daily goal:', e);
         }
     },
 
