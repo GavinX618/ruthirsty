@@ -508,7 +508,7 @@ const app = {
             setTimeout(() => {
                 document.body.removeChild(toast);
             }, 300);
-        }, 2000);
+        }, 1200); // 缩短显示时间：从2000ms改为1200ms
     },
 
     // 格式化日期 (YYYY-MM-DD)
