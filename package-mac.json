@@ -1,0 +1,64 @@
+{
+  "name": "ruthirsty-mac",
+  "version": "1.0.0",
+  "description": "我要喝水 - 喝水打卡应用 (Mac版本)",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "build-mac": "electron-builder --mac",
+    "build-mac-dmg": "electron-builder --mac dmg",
+    "build-mac-zip": "electron-builder --mac zip"
+  },
+  "keywords": ["water", "health", "reminder"],
+  "author": "RUthirsty Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0",
+    "dmg-license": "^1.0.11"
+  },
+  "build": {
+    "appId": "com.ruthirsty.app",
+    "productName": "我要喝水",
+    "mac": {
+      "category": "public.app-category.healthcare-fitness",
+      "icon": "build/icon.icns",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "dmg": {
+      "title": "我要喝水 - 喝水打卡",
+      "icon": "build/icon.icns",
+      "window": {
+        "width": 540,
+        "height": 380
+      },
+      "contents": [
+        {
+          "x": 144,
+          "y": 150
+        },
+        {
+          "x": 396,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "files": [
+      "electron-main.js",
+      "www/**/*"
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "dist-mac"
+    }
+  }
+}

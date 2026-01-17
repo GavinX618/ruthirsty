@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>部署进度检查器</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .step.completed {
+            border-color: #4caf50;
+            background: #f1f8f4;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step.completed .step-number {
+            background: #4caf50;
+        }
+
+        .step.completed .step-number::before {
+            content: '✓';
+        }
+
+        .step-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .step-content {
+            margin-top: 15px;
+            padding-left: 55px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .command {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            overflow-x: auto;
+            border-left: 4px solid #667eea;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 30px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .test-link {
+            display: inline-block;
+            margin: 10px 0;
+            padding: 10px 20px;
+            background: #06b6d4;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .test-link:hover {
+            background: #0891b2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 GitHub Pages 部署进度</h1>
+        <p class="subtitle">我要喝水 - iPhone PWA版本</p>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+        </div>
+
+        <!-- 步骤1 -->
+        <div class="step" id="step1">
+            <div class="step-header" onclick="toggleStep(1)">
+                <div class="step-number">1</div>
+                <div class="step-title">创建GitHub仓库</div>
+            </div>
+            <div class="step-content">
+                <p>1. 访问：<a href="https://github.com/new" target="_blank">https://github.com/new</a></p>
+                <p>2. 填写信息：</p>
+                <div class="command">Repository name: ruthirsty<br>Description: 我要喝水 - 喝水打卡应用<br>Public: ✓</div>
+                <p>3. 点击 "Create repository"</p>
+                <p>4. 复制仓库URL并填入下方：</p>
+                <input type="text" class="url-input" id="repoUrl" placeholder="https://github.com/你的用户名/ruthirsty.git">
+                <button class="btn" onclick="completeStep(1)">✓ 完成此步骤</button>
+            </div>
+        </div>
+
+        <!-- 步骤2 -->
+        <div class="step" id="step2">
+            <div class="step-header" onclick="toggleStep(2)">
+                <div class="step-number">2</div>
+                <div class="step-title">推送代码到GitHub</div>
+            </div>
+            <div class="step-content">
+                <p>在终端逐行执行以下命令：</p>
+                <div class="command" id="commands">
+cd /workspaces/RUthirsty-cordova<br>
+git add .<br>
+git commit -m "iPhone PWA版本"<br>
+git branch -M main<br>
+git remote add origin <span id="repoUrlDisplay" style="color: #e74c3c;">请先完成步骤1</span><br>
+git push -u origin main
+                </div>
+                <div class="note">
+                    ⚠️ 如果提示认证错误，需要使用Personal Access Token（不是密码）<br>
+                    生成Token：<a href="https://github.com/settings/tokens" target="_blank">https://github.com/settings/tokens</a>
+                </div>
+                <button class="btn" onclick="completeStep(2)">✓ 完成此步骤</button>
+            </div>
+        </div>
+
+        <!-- 步骤3 -->
+        <div class="step" id="step3">
+            <div class="step-header" onclick="toggleStep(3)">
+                <div class="step-number">3</div>
+                <div class="step-title">配置GitHub Pages</div>
+            </div>
+            <div class="step-content">
+                <p>1. 刷新GitHub仓库页面</p>
+                <p>2. 点击 <strong>Settings</strong> 标签</p>
+                <p>3. 左侧菜单点击 <strong>Pages</strong></p>
+                <p>4. 配置：</p>
+                <div class="command">Source: Deploy from a branch<br>Branch: main<br>Folder: / (root)</div>
+                <p>5. 点击 <strong>Save</strong></p>
+                <p>6. 等待3-5分钟</p>
+                <button class="btn" onclick="completeStep(3)">✓ 完成此步骤</button>
+            </div>
+        </div>
+
+        <!-- 步骤4 -->
+        <div class="step" id="step4">
+            <div class="step-header" onclick="toggleStep(4)">
+                <div class="step-number">4</div>
+                <div class="step-title">测试应用访问</div>
+            </div>
+            <div class="step-content">
+                <p>你的应用地址应该是：</p>
+                <input type="text" class="url-input" id="appUrl" placeholder="https://你的用户名.github.io/ruthirsty/www/">
+                <p>点击下方链接测试：</p>
+                <a href="#" class="test-link" id="testLink" target="_blank">🔗 打开应用</a>
+                <div class="note">
+                    ⚠️ URL最后必须加 <code>/www/</code>
+                </div>
+                <button class="btn" onclick="completeStep(4)">✓ 完成此步骤</button>
+            </div>
+        </div>
+
+        <!-- 步骤5 -->
+        <div class="step" id="step5">
+            <div class="step-header" onclick="toggleStep(5)">
+                <div class="step-number">5</div>
+                <div class="step-title">在iPhone上安装</div>
+            </div>
+            <div class="step-content">
+                <p><strong>在iPhone上操作：</strong></p>
+                <ol>
+                    <li>打开 <strong>Safari</strong> 浏览器</li>
+                    <li>访问上一步的应用地址</li>
+                    <li>点击底部 <strong>分享按钮</strong>（方框+向上箭头）</li>
+                    <li>选择 <strong>"添加到主屏幕"</strong></li>
+                    <li>确认名称："我要喝水"</li>
+                    <li>点击 <strong>"添加"</strong></li>
+                </ol>
+                <div class="note">
+                    ⚠️ 必须使用Safari浏览器，Chrome不支持！
+                </div>
+                <button class="btn" onclick="completeStep(5)">✓ 完成此步骤</button>
+            </div>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            🎉 恭喜！部署完成！<br>
+            你的"我要喝水"应用已经成功安装到iPhone上了！
+        </div>
+    </div>
+
+    <script>
+        let completedSteps = JSON.parse(localStorage.getItem('deploySteps') || '[]');
+
+        // 初始化
+        window.onload = function() {
+            completedSteps.forEach(step => {
+                document.getElementById('step' + step).classList.add('completed');
+            });
+            updateProgress();
+
+            // 恢复保存的URL
+            document.getElementById('repoUrl').value = localStorage.getItem('repoUrl') || '';
+            document.getElementById('appUrl').value = localStorage.getItem('appUrl') || '';
+            updateRepoUrl();
+            updateAppUrl();
+        };
+
+        function toggleStep(num) {
+            const step = document.getElementById('step' + num);
+            const content = step.querySelector('.step-content');
+            content.style.display = content.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function completeStep(num) {
+            if (!completedSteps.includes(num)) {
+                completedSteps.push(num);
+                localStorage.setItem('deploySteps', JSON.stringify(completedSteps));
+                document.getElementById('step' + num).classList.add('completed');
+                updateProgress();
+
+                if (num === 1) {
+                    const repoUrl = document.getElementById('repoUrl').value;
+                    localStorage.setItem('repoUrl', repoUrl);
+                    updateRepoUrl();
+                }
+
+                if (num === 4) {
+                    const appUrl = document.getElementById('appUrl').value;
+                    localStorage.setItem('appUrl', appUrl);
+                    updateAppUrl();
+                }
+
+                if (completedSteps.length === 5) {
+                    document.getElementById('successMessage').classList.add('show');
+                }
+            }
+        }
+
+        function updateProgress() {
+            const progress = (completedSteps.length / 5) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressFill').textContent = Math.round(progress) + '%';
+        }
+
+        function updateRepoUrl() {
+            const url = document.getElementById('repoUrl').value;
+            if (url) {
+                document.getElementById('repoUrlDisplay').textContent = url;
+                document.getElementById('repoUrlDisplay').style.color = '#27ae60';
+            }
+        }
+
+        function updateAppUrl() {
+            const url = document.getElementById('appUrl').value;
+            if (url) {
+                document.getElementById('testLink').href = url;
+                document.getElementById('testLink').style.opacity = '1';
+            }
+        }
+
+        document.getElementById('repoUrl').addEventListener('input', updateRepoUrl);
+        document.getElementById('appUrl').addEventListener('input', updateAppUrl);
+
+        // 重置按钮
+        function resetProgress() {
+            if (confirm('确定要重置所有进度吗？')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+    </script>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <button class="btn" onclick="resetProgress()" style="background: #e74c3c;">重置进度</button>
+    </div>
+</body>
+</html>

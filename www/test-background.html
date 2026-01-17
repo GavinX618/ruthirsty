@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>背景图片测试</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .test-item {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+        }
+
+        .bg-preview {
+            width: 100%;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .bg-preview::after {
+            content: '加载中...';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+
+        .bg-preview.loaded::after {
+            content: '✓ 加载成功';
+            background: rgba(0,200,0,0.7);
+        }
+
+        .bg-preview.error::after {
+            content: '✗ 加载失败';
+            background: rgba(200,0,0,0.7);
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        .url-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        h2 {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🖼️ 背景图片测试工具</h1>
+        <p>测试哪些图片源可以正常加载</p>
+
+        <div class="test-item">
+            <h2>方案1: Unsplash (推荐)</h2>
+            <div class="bg-preview" id="test1"
+                 style="background-image: url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=80')"></div>
+            <p>URL: https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=80</p>
+            <button onclick="applyBackground('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1920&q=80')">应用此背景</button>
+        </div>
+
+        <div class="test-item">
+            <h2>方案2: Unsplash Source API</h2>
+            <div class="bg-preview" id="test2"
+                 style="background-image: url('https://source.unsplash.com/800x600/?woman,portrait')"></div>
+            <p>URL: https://source.unsplash.com/1920x1080/?woman,portrait</p>
+            <button onclick="applyBackground('https://source.unsplash.com/1920x1080/?woman,portrait')">应用此背景</button>
+        </div>
+
+        <div class="test-item">
+            <h2>方案3: Picsum Photos</h2>
+            <div class="bg-preview" id="test3"
+                 style="background-image: url('https://picsum.photos/800/600?random=1')"></div>
+            <p>URL: https://picsum.photos/1920/1080?random=1</p>
+            <button onclick="applyBackground('https://picsum.photos/1920/1080?random=1')">应用此背景</button>
+        </div>
+
+        <div class="test-item">
+            <h2>方案4: 本地图片</h2>
+            <div class="bg-preview" id="test4"
+                 style="background-image: url('img/background.jpg')"></div>
+            <p>URL: img/background.jpg (需要手动下载图片)</p>
+            <button onclick="applyBackground('img/background.jpg')">应用此背景</button>
+        </div>
+
+        <div class="test-item">
+            <h2>方案5: 自定义URL</h2>
+            <input type="text" class="url-input" id="customUrl"
+                   placeholder="输入图片URL，例如：https://example.com/image.jpg">
+            <button onclick="testCustomUrl()">测试此URL</button>
+            <div class="bg-preview" id="test5" style="background-color: #f0f0f0;"></div>
+            <button onclick="applyCustomBackground()">应用此背景</button>
+        </div>
+
+        <div class="test-item">
+            <h2>📝 应用结果</h2>
+            <p id="result">选择上面的任一方案，点击"应用此背景"按钮</p>
+        </div>
+    </div>
+
+    <script>
+        // 检测图片加载状态
+        function checkImageLoad(elementId, url) {
+            const element = document.getElementById(elementId);
+            const img = new Image();
+
+            img.onload = function() {
+                element.classList.add('loaded');
+                console.log('✓ 加载成功:', url);
+            };
+
+            img.onerror = function() {
+                element.classList.add('error');
+                console.log('✗ 加载失败:', url);
+            };
+
+            img.src = url;
+        }
+
+        // 测试所有预设图片
+        window.onload = function() {
+            checkImageLoad('test1', 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=80');
+            checkImageLoad('test2', 'https://source.unsplash.com/800x600/?woman,portrait');
+            checkImageLoad('test3', 'https://picsum.photos/800/600?random=1');
+            checkImageLoad('test4', 'img/background.jpg');
+        };
+
+        // 测试自定义URL
+        function testCustomUrl() {
+            const url = document.getElementById('customUrl').value;
+            if (!url) {
+                alert('请输入图片URL');
+                return;
+            }
+            const preview = document.getElementById('test5');
+            preview.style.backgroundImage = `url('${url}')`;
+            preview.classList.remove('loaded', 'error');
+            checkImageLoad('test5', url);
+        }
+
+        // 应用背景到主应用
+        function applyBackground(url) {
+            const cssContent = `
+/* 修改 www/css/index.css 文件中的 .bg-gradient 部分：
+
+.bg-gradient {
+    background-image: url('${url}');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+*/`;
+
+            document.getElementById('result').innerHTML = `
+                <p class="success">✓ 已选择此图片源！</p>
+                <p>请按照以下步骤操作：</p>
+                <ol>
+                    <li>打开文件：<code>www/css/index.css</code></li>
+                    <li>找到 <code>.bg-gradient</code> 部分（约第34行）</li>
+                    <li>修改 <code>background-image: url('${url}');</code></li>
+                    <li>保存文件</li>
+                    <li>刷新应用页面（Ctrl+F5 强制刷新）</li>
+                </ol>
+                <p><strong>完整代码：</strong></p>
+                <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto;">${cssContent}</pre>
+            `;
+
+            // 复制到剪贴板
+            navigator.clipboard.writeText(url).then(() => {
+                alert('图片URL已复制到剪贴板！\n\n' + url);
+            }).catch(() => {
+                alert('图片URL:\n\n' + url);
+            });
+        }
+
+        // 应用自定义背景
+        function applyCustomBackground() {
+            const url = document.getElementById('customUrl').value;
+            if (!url) {
+                alert('请先测试自定义URL');
+                return;
+            }
+            applyBackground(url);
+        }
+    </script>
+</body>
+</html>

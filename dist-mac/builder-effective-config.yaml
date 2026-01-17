@@ -1,0 +1,33 @@
+directories:
+  output: dist-mac
+  buildResources: build
+appId: com.ruthirsty.app
+productName: RUthirsty
+mac:
+  category: public.app-category.healthcare-fitness
+  icon: build/icon.icns
+  target:
+    - dmg
+    - zip
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+dmg:
+  title: RUthirsty - 喝水打卡
+  icon: build/icon.icns
+  window:
+    width: 540
+    height: 380
+  contents:
+    - x: 144
+      'y': 150
+    - x: 396
+      'y': 150
+      type: link
+      path: /Applications
+files:
+  - filter:
+      - electron-main.js
+      - www/**/*
+electronVersion: 28.3.3

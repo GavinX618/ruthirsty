@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>记录显示测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        pre {
+            background: #1a1a1a;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .result {
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 打卡记录显示诊断工具</h1>
+
+    <div class="test-section">
+        <h2>步骤1：添加测试记录</h2>
+        <button onclick="addRecord()">添加一条测试记录</button>
+        <button onclick="add5Records()">添加5条测试记录</button>
+        <div id="addResult" class="result" style="display:none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>步骤2：查看存储的记录</h2>
+        <button onclick="checkStorage()">检查localStorage</button>
+        <div id="storageResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>步骤3：测试日期过滤</h2>
+        <button onclick="testDateFilter()">测试今日记录过滤</button>
+        <div id="filterResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>步骤4：测试HTML渲染</h2>
+        <button onclick="testRender()">测试记录渲染</button>
+        <div id="renderResult"></div>
+        <div id="renderDemo"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>步骤5：打开主页面测试</h2>
+        <p>如果以上测试都通过，问题可能在CSS或初始化。</p>
+        <a href="index.html" target="_blank">
+            <button>在新标签页打开主应用</button>
+        </a>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'ruthirsty_records';
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatTime(date) {
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        function getRecords() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveRecords(records) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        }
+
+        function addRecord() {
+            const now = new Date();
+            const record = {
+                id: Date.now(),
+                timestamp: now.toISOString(),
+                date: formatDate(now),
+                time: formatTime(now)
+            };
+
+            let records = getRecords();
+            records.unshift(record);
+            saveRecords(records);
+
+            const resultDiv = document.getElementById('addResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <strong>✅ 记录已添加</strong><br>
+                时间: ${record.time}<br>
+                日期: ${record.date}<br>
+                总记录数: ${records.length}
+            `;
+
+            console.log('添加的记录:', record);
+        }
+
+        function add5Records() {
+            for(let i = 0; i < 5; i++) {
+                setTimeout(() => addRecord(), i * 200);
+            }
+        }
+
+        function checkStorage() {
+            const records = getRecords();
+            const resultDiv = document.getElementById('storageResult');
+
+            if (records.length === 0) {
+                resultDiv.innerHTML = `
+                    <div class="result" style="border-color: orange;">
+                        ⚠️ localStorage中没有记录<br>
+                        请先点击"添加测试记录"
+                    </div>
+                `;
+                return;
+            }
+
+            const today = formatDate(new Date());
+            const todayRecords = records.filter(r => r.date === today);
+
+            resultDiv.innerHTML = `
+                <div class="result" style="border-color: green;">
+                    <strong>✅ localStorage检查通过</strong><br>
+                    总记录数: ${records.length}<br>
+                    今日记录数: ${todayRecords.length}<br>
+                    今日日期: ${today}
+                </div>
+                <h3>最近5条记录：</h3>
+                <pre>${JSON.stringify(records.slice(0, 5), null, 2)}</pre>
+            `;
+        }
+
+        function testDateFilter() {
+            const records = getRecords();
+            const today = formatDate(new Date());
+            const todayRecords = records.filter(r => r.date === today);
+
+            const resultDiv = document.getElementById('filterResult');
+
+            console.log('今日日期:', today);
+            console.log('所有记录:', records);
+            console.log('今日记录:', todayRecords);
+
+            resultDiv.innerHTML = `
+                <div class="result">
+                    <strong>日期过滤测试</strong><br>
+                    当前日期: ${today}<br>
+                    总记录: ${records.length} 条<br>
+                    今日记录: ${todayRecords.length} 条<br>
+                    <br>
+                    ${todayRecords.length > 0 ? '✅ 过滤成功' : '❌ 没有今日记录或过滤失败'}
+                </div>
+                ${todayRecords.length > 0 ? `
+                    <h3>今日记录详情：</h3>
+                    <pre>${JSON.stringify(todayRecords, null, 2)}</pre>
+                ` : ''}
+            `;
+        }
+
+        function testRender() {
+            const records = getRecords();
+            const today = formatDate(new Date());
+            const todayRecords = records.filter(r => r.date === today);
+
+            const resultDiv = document.getElementById('renderResult');
+            const demoDiv = document.getElementById('renderDemo');
+
+            if (todayRecords.length === 0) {
+                resultDiv.innerHTML = `
+                    <div class="result" style="border-color: orange;">
+                        ⚠️ 没有今日记录可以渲染<br>
+                        请先添加测试记录
+                    </div>
+                `;
+                return;
+            }
+
+            // 生成HTML
+            let html = '<div style="background: #f5f5f5; padding: 15px; border-radius: 8px;">';
+            html += '<h3>模拟的记录列表：</h3>';
+            todayRecords.forEach((record, index) => {
+                html += `
+                    <div style="background: white; padding: 15px; margin: 10px 0; border-radius: 8px; display: flex; align-items: center; gap: 15px;">
+                        <div style="font-size: 2em;">💧</div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 1.2em; font-weight: bold;">${record.time}</div>
+                            <div style="color: #666;">${record.date}</div>
+                        </div>
+                        <div style="font-size: 1.5em; font-weight: bold; color: #667eea;">#${todayRecords.length - index}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            resultDiv.innerHTML = `
+                <div class="result" style="border-color: green;">
+                    ✅ HTML渲染成功<br>
+                    渲染了 ${todayRecords.length} 条记录
+                </div>
+            `;
+
+            demoDiv.innerHTML = html;
+        }
+
+        // 页面加载时自动检查
+        window.onload = function() {
+            console.log('诊断页面已加载');
+            console.log('localStorage可用:', typeof(Storage) !== "undefined");
+        };
+    </script>
+</body>
+</html>

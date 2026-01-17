@@ -1,0 +1,30 @@
+# Cordova项目忽略文件
+
+# Node modules
+node_modules/
+
+# Cordova平台和插件
+platforms/
+plugins/
+
+# 构建输出
+www/cordova.js
+www/cordova_plugins.js
+www/plugins/
+
+# IDE文件
+.vscode/
+.idea/
+*.sublime-*
+
+# OS文件
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+npm-debug.log*
+
+# 临时文件
+*.tmp
+*.temp

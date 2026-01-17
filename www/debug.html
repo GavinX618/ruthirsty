@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RUthirsty - 调试面板</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #667eea;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        button.danger {
+            background: #ef4444;
+        }
+        button.danger:hover {
+            background: #dc2626;
+        }
+        .info-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+        .records-list {
+            list-style: none;
+            padding: 0;
+        }
+        .record-item {
+            background: #f9fafb;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-panel">
+        <h1>🔧 RUthirsty 调试面板</h1>
+
+        <h2>📊 当前状态</h2>
+        <div class="info-box">
+            <p><strong>总记录数:</strong> <span id="totalCount">0</span></p>
+            <p><strong>今日记录数:</strong> <span id="todayCount">0</span></p>
+            <p><strong>localStorage可用:</strong> <span id="storageStatus">检查中...</span></p>
+        </div>
+
+        <h2>🎯 快速操作</h2>
+        <button onclick="addTestRecord()">添加测试记录</button>
+        <button onclick="add5Records()">添加5条记录</button>
+        <button onclick="refreshDisplay()">刷新显示</button>
+        <button class="danger" onclick="clearAllRecords()">清除所有记录</button>
+
+        <h2>📝 今日记录</h2>
+        <div id="recordsDisplay"></div>
+
+        <h2>🔍 原始数据</h2>
+        <button onclick="showRawData()">查看原始数据</button>
+        <pre id="rawDataDisplay" style="display:none;"></pre>
+
+        <h2>💡 使用说明</h2>
+        <div class="info-box">
+            <p>1. 点击"添加测试记录"按钮测试功能</p>
+            <p>2. 如果看不到记录，点击"查看原始数据"检查存储</p>
+            <p>3. 记录应该会自动显示在"今日记录"区域</p>
+            <p>4. 回到主页面（index.html）查看实际效果</p>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'ruthirsty_records';
+
+        // 检查localStorage
+        function checkStorage() {
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                document.getElementById('storageStatus').textContent = '✅ 可用';
+                return true;
+            } catch (e) {
+                document.getElementById('storageStatus').textContent = '❌ 不可用';
+                return false;
+            }
+        }
+
+        // 格式化日期
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // 格式化时间
+        function formatTime(date) {
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        // 获取所有记录
+        function getRecords() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                console.error('读取记录失败:', e);
+                return [];
+            }
+        }
+
+        // 保存记录
+        function saveRecords(records) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+                return true;
+            } catch (e) {
+                console.error('保存记录失败:', e);
+                return false;
+            }
+        }
+
+        // 获取今日记录
+        function getTodayRecords() {
+            const records = getRecords();
+            const today = formatDate(new Date());
+            return records.filter(record => record.date === today);
+        }
+
+        // 添加测试记录
+        function addTestRecord() {
+            const now = new Date();
+            const record = {
+                id: Date.now(),
+                timestamp: now.toISOString(),
+                date: formatDate(now),
+                time: formatTime(now)
+            };
+
+            let records = getRecords();
+            records.unshift(record);
+
+            if (saveRecords(records)) {
+                console.log('记录添加成功:', record);
+                refreshDisplay();
+            } else {
+                alert('添加记录失败！');
+            }
+        }
+
+        // 添加5条记录
+        function add5Records() {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => addTestRecord(), i * 100);
+            }
+        }
+
+        // 清除所有记录
+        function clearAllRecords() {
+            if (confirm('确定要清除所有记录吗？')) {
+                localStorage.removeItem(STORAGE_KEY);
+                refreshDisplay();
+                alert('所有记录已清除');
+            }
+        }
+
+        // 刷新显示
+        function refreshDisplay() {
+            const todayRecords = getTodayRecords();
+            const allRecords = getRecords();
+
+            // 更新统计
+            document.getElementById('totalCount').textContent = allRecords.length;
+            document.getElementById('todayCount').textContent = todayRecords.length;
+
+            // 显示记录列表
+            const display = document.getElementById('recordsDisplay');
+            if (todayRecords.length === 0) {
+                display.innerHTML = '<div class="info-box">暂无今日记录</div>';
+            } else {
+                let html = '<ul class="records-list">';
+                todayRecords.forEach((record, index) => {
+                    html += `
+                        <li class="record-item">
+                            <strong>#${todayRecords.length - index}</strong> -
+                            ${record.time} (${record.date})
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+                display.innerHTML = html;
+            }
+        }
+
+        // 显示原始数据
+        function showRawData() {
+            const rawData = localStorage.getItem(STORAGE_KEY);
+            const pre = document.getElementById('rawDataDisplay');
+
+            if (rawData) {
+                const parsed = JSON.parse(rawData);
+                pre.textContent = JSON.stringify(parsed, null, 2);
+                pre.style.display = 'block';
+            } else {
+                pre.textContent = '没有数据';
+                pre.style.display = 'block';
+            }
+        }
+
+        // 页面加载时初始化
+        window.onload = function() {
+            checkStorage();
+            refreshDisplay();
+        };
+    </script>
+</body>
+</html>
