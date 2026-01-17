@@ -658,7 +658,7 @@ body {
 /* Record Item - Glass Card */
 .record-item {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr auto auto;
     align-items: center;
     gap: 15px;
     padding: 20px;
@@ -676,6 +676,39 @@ body {
     opacity: 0;
     position: relative;
     overflow: hidden;
+}
+
+/* Delete Button */
+.record-delete-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(239, 68, 68, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 1.2em;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.record-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.record-delete-btn:active {
+    transform: scale(0.95);
+}
+
+.record-delete-btn span {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
 }
 
 .record-item::before {
@@ -907,6 +940,12 @@ body {
     .record-item {
         padding: 18px 15px;
         gap: 12px;
+    }
+
+    .record-delete-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1.1em;
     }
 
     .record-icon {

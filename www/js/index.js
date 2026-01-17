@@ -288,7 +288,7 @@ const app = {
             const badgeText = amount >= 300 ? '大杯' : amount >= 200 ? '中杯' : '小杯';
 
             html += `
-                <div class="record-item" style="animation-delay: ${index * 0.05}s">
+                <div class="record-item" style="animation-delay: ${index * 0.05}s" data-id="${record.id}">
                     <div class="record-icon">💧</div>
                     <div class="record-info">
                         <div class="record-time">${record.time}</div>
@@ -298,12 +298,63 @@ const app = {
                         <div class="record-volume">${amount}ml</div>
                         <div class="record-badge">${badgeText}</div>
                     </div>
+                    <button class="record-delete-btn" data-id="${record.id}">
+                        <span>🗑️</span>
+                    </button>
                 </div>
             `;
         });
 
         recordsList.innerHTML = html;
         console.log('记录列表已更新，显示', todayRecords.length, '条记录');
+
+        // 绑定删除按钮事件
+        this.bindDeleteButtons();
+    },
+
+    // 绑定删除按钮事件
+    bindDeleteButtons: function() {
+        const deleteButtons = document.querySelectorAll('.record-delete-btn');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const recordId = parseInt(button.getAttribute('data-id'));
+                const recordItem = button.closest('.record-item');
+
+                // 添加删除动画
+                recordItem.style.transition = 'all 0.3s ease';
+                recordItem.style.transform = 'scale(0.8)';
+                recordItem.style.opacity = '0';
+
+                // 等待动画完成后删除
+                setTimeout(() => {
+                    this.deleteRecord(recordId);
+                }, 300);
+            });
+        });
+    },
+
+    // 删除记录
+    deleteRecord: function(recordId) {
+        // 获取所有记录
+        let records = this.getRecords();
+
+        // 找到要删除的记录
+        const recordToDelete = records.find(r => r.id === recordId);
+        if (!recordToDelete) return;
+
+        // 从数组中删除
+        records = records.filter(r => r.id !== recordId);
+
+        // 保存更新后的记录
+        this.saveRecords(records);
+
+        // 更新界面
+        this.updateUI();
+
+        // 显示提示
+        this.showToast(`🗑️ 已删除 ${recordToDelete.amount}ml 打卡记录`);
     },
 
     // 显示提示信息
