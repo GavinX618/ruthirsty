@@ -1,9 +1,14 @@
 // RUthirsty - 喝水打卡应用（升级版）
 // 数据存储键名
 const STORAGE_KEY = 'ruthirsty_records';
+const REMINDER_SETTINGS_KEY = 'ruthirsty_reminder_settings';
 
 // 每日目标（ml）
 const DAILY_GOAL = 2000;
+
+// 提醒定时器
+let reminderTimer = null;
+let lastNotificationTime = 0;
 
 // 音频上下文（用于生成声音）
 let audioContext = null;
@@ -72,7 +77,9 @@ const app = {
         console.log('App is ready');
         this.bindEvents();
         this.loadRecords();
+        this.loadReminderSettings();
         this.updateUI();
+        this.requestNotificationPermission();
     },
 
     // 绑定事件
@@ -84,6 +91,44 @@ const app = {
                 const amount = parseInt(button.getAttribute('data-amount'));
                 this.onDrinkButtonClick(button, amount);
             });
+        });
+
+        // 绑定提醒开关
+        const reminderToggle = document.getElementById('reminderToggle');
+        const reminderTimeSettings = document.getElementById('reminderTimeSettings');
+
+        reminderToggle.addEventListener('change', () => {
+            const enabled = reminderToggle.checked;
+            reminderTimeSettings.style.display = enabled ? 'block' : 'none';
+            this.saveReminderSettings();
+
+            if (enabled) {
+                this.startReminder();
+                this.showToast('✅ 智能提醒已开启');
+            } else {
+                this.stopReminder();
+                this.showToast('❌ 提醒已关闭');
+            }
+        });
+
+        // 绑定时间设置变化
+        const startTimeInput = document.getElementById('reminderStartTime');
+        const endTimeInput = document.getElementById('reminderEndTime');
+
+        startTimeInput.addEventListener('change', () => {
+            this.saveReminderSettings();
+            if (reminderToggle.checked) {
+                this.stopReminder();
+                this.startReminder();
+            }
+        });
+
+        endTimeInput.addEventListener('change', () => {
+            this.saveReminderSettings();
+            if (reminderToggle.checked) {
+                this.stopReminder();
+                this.startReminder();
+            }
         });
     },
 
@@ -390,6 +435,180 @@ const app = {
         const minutes = String(date.getMinutes()).padStart(2, '0');
         const seconds = String(date.getSeconds()).padStart(2, '0');
         return `${hours}:${minutes}:${seconds}`;
+    },
+
+    // 请求通知权限
+    requestNotificationPermission: function() {
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission().then(permission => {
+                console.log('Notification permission:', permission);
+            });
+        }
+    },
+
+    // 加载提醒设置
+    loadReminderSettings: function() {
+        try {
+            const settings = localStorage.getItem(REMINDER_SETTINGS_KEY);
+            if (settings) {
+                const { enabled, startTime, endTime } = JSON.parse(settings);
+                document.getElementById('reminderToggle').checked = enabled || false;
+                document.getElementById('reminderStartTime').value = startTime || '08:00';
+                document.getElementById('reminderEndTime').value = endTime || '20:00';
+
+                const reminderTimeSettings = document.getElementById('reminderTimeSettings');
+                reminderTimeSettings.style.display = enabled ? 'block' : 'none';
+
+                if (enabled) {
+                    this.startReminder();
+                }
+            }
+        } catch (e) {
+            console.error('Error loading reminder settings:', e);
+        }
+    },
+
+    // 保存提醒设置
+    saveReminderSettings: function() {
+        try {
+            const settings = {
+                enabled: document.getElementById('reminderToggle').checked,
+                startTime: document.getElementById('reminderStartTime').value,
+                endTime: document.getElementById('reminderEndTime').value
+            };
+            localStorage.setItem(REMINDER_SETTINGS_KEY, JSON.stringify(settings));
+        } catch (e) {
+            console.error('Error saving reminder settings:', e);
+        }
+    },
+
+    // 开始提醒
+    startReminder: function() {
+        console.log('启动智能提醒');
+        // 每10分钟检查一次是否需要提醒
+        reminderTimer = setInterval(() => {
+            this.checkAndNotify();
+        }, 10 * 60 * 1000); // 10分钟
+
+        // 立即检查一次
+        setTimeout(() => {
+            this.checkAndNotify();
+        }, 5000); // 5秒后首次检查
+    },
+
+    // 停止提醒
+    stopReminder: function() {
+        console.log('停止提醒');
+        if (reminderTimer) {
+            clearInterval(reminderTimer);
+            reminderTimer = null;
+        }
+    },
+
+    // 检查是否需要提醒
+    checkAndNotify: function() {
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentMinute = now.getMinutes();
+        const currentTime = currentHour * 60 + currentMinute; // 转换为分钟
+
+        // 获取设置的时间段
+        const startTime = document.getElementById('reminderStartTime').value;
+        const endTime = document.getElementById('reminderEndTime').value;
+
+        const [startHour, startMin] = startTime.split(':').map(Number);
+        const [endHour, endMin] = endTime.split(':').map(Number);
+
+        const startMinutes = startHour * 60 + startMin;
+        const endMinutes = endHour * 60 + endMin;
+
+        // 检查是否在提醒时间段内
+        if (currentTime < startMinutes || currentTime > endMinutes) {
+            console.log('不在提醒时间段内');
+            return;
+        }
+
+        // 检查是否刚刚通知过（避免频繁通知）
+        const timeSinceLastNotification = Date.now() - lastNotificationTime;
+        if (timeSinceLastNotification < 30 * 60 * 1000) { // 30分钟内不重复通知
+            console.log('距离上次通知时间太短');
+            return;
+        }
+
+        // 智能判断是否需要提醒
+        const todayTotal = this.getTodayTotal();
+        const todayRecords = this.getTodayRecords();
+        const percentage = (todayTotal / DAILY_GOAL) * 100;
+
+        // 计算预期进度（根据当前时间）
+        const totalMinutes = endMinutes - startMinutes;
+        const passedMinutes = currentTime - startMinutes;
+        const expectedPercentage = (passedMinutes / totalMinutes) * 100;
+
+        let shouldNotify = false;
+        let message = '';
+
+        // 智能提醒逻辑
+        if (todayRecords.length === 0) {
+            // 还没开始喝水
+            shouldNotify = true;
+            message = '💧 今天还没有喝水哦！快来打卡吧~';
+        } else if (percentage < 25 && currentTime > startMinutes + 120) {
+            // 超过2小时了，但进度不到25%
+            shouldNotify = true;
+            message = `💧 已经${Math.floor(passedMinutes / 60)}小时了，才喝了${todayTotal}ml，加油哦！`;
+        } else if (percentage < expectedPercentage - 20) {
+            // 实际进度落后预期20%以上
+            shouldNotify = true;
+            const remaining = DAILY_GOAL - todayTotal;
+            message = `💧 进度有点落后啦！还需要${remaining}ml才能达成目标！`;
+        } else if (percentage >= 50 && percentage < 60 && todayRecords.length < 3) {
+            // 进度过半但打卡次数少，提醒多喝几次
+            shouldNotify = true;
+            message = '💧 进度不错！记得少量多次更健康哦~';
+        }
+
+        if (shouldNotify) {
+            this.sendNotification(message);
+            lastNotificationTime = Date.now();
+        }
+    },
+
+    // 发送通知
+    sendNotification: function(message) {
+        console.log('发送通知:', message);
+
+        // 检查通知权限
+        if ('Notification' in window && Notification.permission === 'granted') {
+            try {
+                const notification = new Notification('我要喝水 💧', {
+                    body: message,
+                    icon: 'img/icon-192.png',
+                    badge: 'img/icon-192.png',
+                    vibrate: [200, 100, 200],
+                    tag: 'water-reminder',
+                    requireInteraction: false
+                });
+
+                // 点击通知时聚焦窗口
+                notification.onclick = function() {
+                    window.focus();
+                    notification.close();
+                };
+
+                // 3秒后自动关闭
+                setTimeout(() => {
+                    notification.close();
+                }, 3000);
+            } catch (e) {
+                console.error('Error sending notification:', e);
+                // 如果通知失败，使用toast提示
+                this.showToast(message);
+            }
+        } else {
+            // 如果没有通知权限，使用toast提示
+            this.showToast(message);
+        }
     }
 };
 

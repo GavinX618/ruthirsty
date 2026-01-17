@@ -106,6 +106,33 @@
             </div>
         </div>
 
+        <!-- 提醒设置 -->
+        <div class="reminder-settings">
+            <h3 class="section-title">⏰ 智能提醒</h3>
+            <div class="reminder-content">
+                <div class="reminder-toggle">
+                    <span class="reminder-label">开启提醒</span>
+                    <label class="switch">
+                        <input type="checkbox" id="reminderToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="reminder-time-settings" id="reminderTimeSettings" style="display: none;">
+                    <div class="time-setting-row">
+                        <span class="time-label">开始时间</span>
+                        <input type="time" id="reminderStartTime" value="08:00" class="time-input">
+                    </div>
+                    <div class="time-setting-row">
+                        <span class="time-label">结束时间</span>
+                        <input type="time" id="reminderEndTime" value="20:00" class="time-input">
+                    </div>
+                    <div class="reminder-info">
+                        💡 系统会根据您的喝水进度智能提醒
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 快捷打卡按钮组 -->
         <div class="quick-buttons">
             <h3 class="section-title">👇 点击下方按钮打卡</h3>
