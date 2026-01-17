@@ -224,6 +224,32 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 数据管理 -->
+                <div class="settings-section">
+                    <h3 class="settings-section-title">🗑️ 数据管理</h3>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-label">清除所有数据</span>
+                            <span class="setting-desc">删除所有打卡记录（不可恢复）</span>
+                        </div>
+                        <button class="clear-data-btn" id="clearDataBtn">清除数据</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认对话框 -->
+    <div class="confirm-modal" id="confirmModal">
+        <div class="confirm-overlay"></div>
+        <div class="confirm-dialog">
+            <div class="confirm-icon">⚠️</div>
+            <h3 class="confirm-title">确认清除数据？</h3>
+            <p class="confirm-message">此操作将删除所有打卡记录，包括历史数据和统计信息。此操作不可恢复！</p>
+            <div class="confirm-buttons">
+                <button class="confirm-btn cancel" id="confirmCancelBtn">取消</button>
+                <button class="confirm-btn confirm" id="confirmOkBtn">确认清除</button>
             </div>
         </div>
     </div>

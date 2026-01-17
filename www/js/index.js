@@ -190,6 +190,32 @@ const app = {
             currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
             this.renderCalendar();
         });
+
+        // 绑定清除数据按钮
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        clearDataBtn.addEventListener('click', () => {
+            this.showConfirmDialog();
+        });
+
+        // 绑定确认对话框按钮
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+        const confirmOkBtn = document.getElementById('confirmOkBtn');
+
+        confirmCancelBtn.addEventListener('click', () => {
+            confirmModal.classList.remove('show');
+        });
+
+        confirmOkBtn.addEventListener('click', () => {
+            this.clearAllData();
+            confirmModal.classList.remove('show');
+        });
+
+        // 点击遮罩层关闭对话框
+        const confirmOverlay = confirmModal.querySelector('.confirm-overlay');
+        confirmOverlay.addEventListener('click', () => {
+            confirmModal.classList.remove('show');
+        });
     },
 
     // 打卡按钮点击事件
@@ -752,6 +778,35 @@ const app = {
 
         // 更新DOM
         document.getElementById('calendarDays').innerHTML = calendarHTML;
+    },
+
+    // 显示确认对话框
+    showConfirmDialog: function() {
+        const confirmModal = document.getElementById('confirmModal');
+        confirmModal.classList.add('show');
+    },
+
+    // 清除所有数据
+    clearAllData: function() {
+        try {
+            // 清除所有打卡记录
+            localStorage.removeItem(STORAGE_KEY);
+
+            // 重置日历到当前月
+            currentCalendarDate = new Date();
+
+            // 更新所有UI
+            this.updateUI();
+            this.renderCalendar();
+
+            // 显示成功提示
+            this.showToast('✅ 所有数据已清除');
+
+            console.log('所有数据已清除');
+        } catch (e) {
+            console.error('清除数据失败:', e);
+            this.showToast('❌ 清除数据失败');
+        }
     }
 };
 
