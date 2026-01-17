@@ -8,6 +8,10 @@
         RUthirsty Team
     </author>
     <content src="index.html" />
+
+    <!-- App Icons -->
+    <icon src="www/img/icon-192.png" />
+
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -19,6 +23,14 @@
         <allow-intent href="market:*" />
         <preference name="android-minSdkVersion" value="24" />
         <preference name="android-targetSdkVersion" value="35" />
+
+        <!-- Android Icons -->
+        <icon density="ldpi" src="www/img/icon-192.png" />
+        <icon density="mdpi" src="www/img/icon-192.png" />
+        <icon density="hdpi" src="www/img/icon-192.png" />
+        <icon density="xhdpi" src="www/img/icon-192.png" />
+        <icon density="xxhdpi" src="www/img/icon-512.png" />
+        <icon density="xxxhdpi" src="www/img/icon-512.png" />
     </platform>
     <preference name="DisallowOverscroll" value="true" />
     <preference name="android-build-tool" value="gradle" />
