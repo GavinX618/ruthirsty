@@ -2,7 +2,7 @@
   "name": "我要喝水",
   "short_name": "喝水",
   "description": "喝水打卡应用 - 帮助你养成健康的喝水习惯",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",
